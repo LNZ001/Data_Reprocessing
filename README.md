@@ -41,7 +41,7 @@ This is a high concurrency general framework for rapid feature collection and pr
 
    **[初始框架如图所示](https://www.processon.com/view/link/5e40ed85e4b021dc28a041f5)：**
 
-![image-20200506184028874](C:\Users\Magicbook\AppData\Roaming\Typora\typora-user-images\image-20200506184028874.png)
+![image-0](https://github.com/LNZ001/Data_Reprocessing/blob/master/images/image-20200506184028874.png)
 
 ## 代码实现及说明
 
