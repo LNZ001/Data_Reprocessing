@@ -34,10 +34,10 @@ class KafkaStream:
             logger.error(f"fail to init kafka consumer.[{topic}][{e}]")
             sys.exit(f"fail to init kafka consumer.[{topic}]")
 
-    def handler(self, data):
+    async def handler(self, data):
         pass
 
-    def read_stream(self):
+    async def read_stream(self):
         # 监听kafka
         try:
             while True:
@@ -51,13 +51,13 @@ class KafkaStream:
                 else:
                     data = json.loads(message.value().decode("utf-8"))
                     try:
-                        signal = await self.handler(data)
+                        finish = await self.handler(data)
                     except Exception as e:
-                        logger.info(f"解析出现异常[{e}]")
+                        logger.info(f"handler解析出现异常[{e}]")
                         time.sleep(1)
                         continue
 
-                    if signal:
+                    if finish:
                         self.consumer.commit(asynchronus=True) # 不需要等待到触发回调函数之后.(?)
 
         except Exception as e:
