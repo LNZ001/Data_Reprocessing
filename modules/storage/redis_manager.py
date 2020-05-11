@@ -8,6 +8,8 @@ class Redis:
         self.redis_config = config
         self.log = logger
 
+        self.init()
+
     def init(self):
         try:
             self.redis = redis.Redis(**self.redis_config)

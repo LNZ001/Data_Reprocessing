@@ -17,11 +17,19 @@ class BlockTimeStream(FileStream):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.redis_key = "time_block_map"
-        self.buffer.rpush(self.redis_key, 0)
+
+        # ######### 检查已经写入的位置 ###########
+        self.offset = self.buffer.llen(self.redis_key)
+        if self.offset == 0:
+            self.buffer.rpush(self.redis_key, 0)
 
     # 每一条写入redis
-    def work(self, info):
-        timestamp = int(info.strip().split(",")[1])
+    def work(self, info, read_cnt=None):
+        block_num, timestamp = tuple(map(int, info.strip().split(",")))
+
+        # ######### check ###########
+        if block_num < self.offset:
+            return
 
         # 存储到redis
         self.buffer.rpush(self.redis_key, timestamp)
@@ -29,8 +37,18 @@ class BlockTimeStream(FileStream):
 # ######### first data add init ###########
 class FirstDataStream(FileStream):
 
-    def work(self, info):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # ######### 检查已经写入的位置 ###########
+        self.offset = self.buffer.dbsize()
+
+    def work(self, info, read_cnt=None):
         address, first_rs = info.strip().split(",", 1)
+
+        if read_cnt < self.offset:
+            return
+
         self.buffer.set(address, first_rs)
 
 # ######### addr info add work ###########
@@ -46,7 +64,7 @@ class AddrInfoStream(FileStream):
         redis_config["db"] = 4
         self.first_data_manager = redis_manager.Redis(redis_config)
 
-    def work(self, info):
+    def work(self, info, read_cnt=None):
         # 原始：_id, balance, receive, spend, last_receive_block, first_receive_block, last_spend_block, first_spend_block,
         # tx_count, input_tx_count, output_tx_count, input_address_count, output_address_count, utxo_count
         address = info["_id"]

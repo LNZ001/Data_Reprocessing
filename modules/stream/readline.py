@@ -1,12 +1,17 @@
 import json
 from loguru import logger
+import asyncio
 
 class FileStream:
 
     def __init__(self, buffer):
         self.buffer = buffer
+        self.init()
 
-    def work(self, info):
+    def init(self):
+        pass
+
+    def work(self, info, read_cnt=None):
         pass
 
     def save(self):
@@ -18,13 +23,18 @@ class FileStream:
     '''
     提供多次读取的能力, 生成器.
     '''
-    async def read_stream(self, path, is_json=True, line_limit=None):
+    @asyncio.coroutine
+    def read_stream(self, path, is_json=True, line_limit=None):
         self.path = path
         with open(path, "r") as f:
             read_cnt = 0
             while True:
 
                 info = f.readline()
+                # temp
+                if info == "\n":
+                    continue
+
                 if not info:
                     break
 
@@ -33,11 +43,14 @@ class FileStream:
 
                 read_cnt += 1
                 if line_limit is not None and read_cnt % line_limit == 0:
-                    logger.info(f"read file line [{read_cnt}]")
+                    logger.info(f"save file line [{read_cnt}]")
                     self.save()
                     yield {}
 
-                self.work(info)
+                if read_cnt % 5000000 == 0:
+                    logger.info(f"read file line [{read_cnt}]")
+
+                self.work(info, read_cnt=read_cnt)
 
             self.save()
             return

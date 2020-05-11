@@ -6,7 +6,8 @@ def ipath(workdir, tag):
         for filename in os.listdir(workdir):
             if tag in filename:
                 files.append(os.path.join(workdir, filename))
-            print(f"{tag} count={len(files)}, files={files}")
+        print(f"{tag} count={len(files)}, files={files}")
+        return files
     except Exception:
         time.sleep(2)
         print(f"检查文件是否需要: [{workdir}][{tag}]")
