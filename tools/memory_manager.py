@@ -1,14 +1,6 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
-'''
-@File    :   memory_manager.py
-@Contact :   linz@lianantech.com
-@License :   (C)Copyright 2019-2020, Beosin
 
-@Modify Time      @Author    @Version    @Desciption
-------------      -------    --------    -----------
-2020/1/8 下午2:46   lnz        1.0         None
-'''
 import argparse
 import time
 
